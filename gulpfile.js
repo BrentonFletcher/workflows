@@ -6,6 +6,7 @@ var gulp = require('gulp'),
 	connect = require('gulp-connect'),
 	gulpif = require('gulp-if'),
 	uglify = require('gulp-uglify'),
+	minifyHTML = require('gulp-minify-html'),
 	concat = require('gulp-concat');
 
 var env,
@@ -19,8 +20,8 @@ var env,
 	
 env = process.env.NODE_ENV || 'development';
 
-if (env==='development') {
-	outputDir = 'builds/devlopment/';
+if (env === 'development') {
+	outputDir = 'builds/development/';
 	sassStyle = 'expanded';
 }	else {
 	outputDir = 'builds/production/';
@@ -70,7 +71,7 @@ gulp.task('watch', function() {
 	gulp.watch(coffeeSources, ['coffee']);
 	gulp.watch(jsSources, ['js']);
 	gulp.watch('components/sass/*.scss', ['compass']);
-	gulp.watch(htmlSources, ['html']);
+	gulp.watch('builds/devlopment/*.html', ['html']);
 	gulp.watch(jsonSources, ['json']);
 });
 
@@ -82,7 +83,9 @@ gulp.task('connect', function() {
 });
 
 gulp.task('html', function() {
-	gulp.src(htmlSources)
+	gulp.src('builds/development/*.html')
+		.pipe(gulpif(env === 'production', minifyHTML()))
+		.pipe(gulpif(env === 'production', gulp.dest(outputDir)))
 		.pipe(connect.reload())
 });
 
